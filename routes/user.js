@@ -61,7 +61,7 @@ router.post("/user/login", async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    res.status(405).json({ message: "Unauthorized" });
+    return res.status(405).json({ message: "Unauthorized" });
   }
 
   const user = await User.findOne({ email: email });
