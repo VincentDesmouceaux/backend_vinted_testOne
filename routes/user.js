@@ -18,8 +18,12 @@ router.post("/user/signup", async (req, res) => {
 
     if (!username) {
       return res
-        .status(400)
+        .status(402)
         .json({ message: "le username n'est pas renseigné" });
+    }
+
+    if (!email) {
+      return res.status(403).json({ message: "le mail n'est pas renseigné" });
     }
 
     const salt = uid2(16);
