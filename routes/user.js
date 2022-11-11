@@ -74,7 +74,7 @@ router.post("/user/login", async (req, res) => {
     console.log("On peut se connecter");
   } else {
     console.log("Unauthorized");
-    res.status(400).json({ message: "Unauthorized" });
+    res.status(405).json({ message: "Unauthorized" });
   }
 });
 module.exports = router;
