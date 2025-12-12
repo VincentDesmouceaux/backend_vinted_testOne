@@ -58,27 +58,43 @@ router.post("/user/signup", async (req, res) => {
 });
 
 router.post("/user/login", async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  if (!email || !password) {
-    return res.status(405).json({ message: "Unauthorized" });
-  }
+    // 1) Vérifier les champs
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email et mot de passe requis" });
+    }
 
-  const user = await User.findOne({ email: email });
+    // 2) Chercher l'utilisateur
+    const user = await User.findOne({ email: email });
 
-  const newHash = SHA256(user.salt + password).toString(encBase64);
-  if (newHash === user.hash) {
-    res.json({
+    if (!user) {
+      // Email inconnu
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    // 3) Recalculer le hash
+    const newHash = SHA256(user.salt + password).toString(encBase64);
+
+    if (newHash !== user.hash) {
+      // Mot de passe incorrect
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    // 4) OK → renvoyer les infos utilisateur
+    console.log("On peut se connecter");
+    return res.json({
       _id: user._id,
       token: user.token,
       account: {
         username: user.account.username,
       },
     });
-    console.log("On peut se connecter");
-  } else {
-    console.log("Unauthorized");
-    res.status(405).json({ message: "Unauthorized" });
+  } catch (error) {
+    console.error("LOGIN ERROR:", error);
+    return res.status(500).json({ message: error.message });
   }
 });
+
 module.exports = router;
